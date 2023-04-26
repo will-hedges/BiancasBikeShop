@@ -6,7 +6,7 @@ export default function BikeList({ setDetailsBikeId }) {
   const [bikes, setBikes] = useState([]);
 
   const getAllBikes = () => {
-    getBikes().then((res) => setBikes(res));
+    getBikes().then(setBikes);
   };
 
   useEffect(() => {
@@ -15,9 +15,8 @@ export default function BikeList({ setDetailsBikeId }) {
   return (
     <>
       <h2>Bikes</h2>
-      {/* Use BikeCard component here to list bikes...*/}
       {bikes.map((bike) => (
-        <BikeCard bike={bike} />
+        <BikeCard bike={bike} setDetailsBikeId={setDetailsBikeId} />
       ))}
     </>
   );
