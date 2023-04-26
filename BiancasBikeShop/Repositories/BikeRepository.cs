@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using BiancasBikeShop.Models;
+using Tabloid.Utils;
 
 namespace BiancasBikeShop.Repositories
 {
@@ -11,15 +12,54 @@ namespace BiancasBikeShop.Repositories
         {
             get
             {
-                return new SqlConnection("server=localhost\\SQLExpress;database=BiancasBikeShop;integrated security=true;TrustServerCertificate=true");
+                return new SqlConnection(
+                    "server=localhost\\SQLExpress;database=BiancasBikeShop;integrated security=true;TrustServerCertificate=true"
+                );
             }
         }
 
         public List<Bike> GetAllBikes()
         {
-            var bikes = new List<Bike>();
-            // implement code here... 
-            return bikes;
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText =
+                        @"
+                        SELECT b.Id, b.Brand, b.Color,
+		                        bt.[Name] AS BikeTypeName,
+		                        o.[Name] AS OwnerName
+                        FROM Bike b
+	                        JOIN BikeType bt ON bt.Id = b.BikeTypeId
+	                        LEFT JOIN Owner o ON o.Id = b.OwnerId
+                        ";
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var bikes = new List<Bike>();
+                        while (reader.Read())
+                        {
+                            Bike bike = new Bike()
+                            {
+                                Id = DbUtils.GetInt(reader, "Id"),
+                                Brand = DbUtils.GetString(reader, "Brand"),
+                                Color = DbUtils.GetString(reader, "Color"),
+                                BikeType = new BikeType()
+                                {
+                                    Name = DbUtils.GetString(reader, "BikeTypeName")
+                                },
+                                Owner = new Owner()
+                                {
+                                    Name = DbUtils.GetString(reader, "OwnerName")
+                                }
+                            };
+                            bikes.Add(bike);
+                        }
+                        return bikes;
+                    }
+                }
+            }
         }
 
         public Bike GetBikeById(int id)
@@ -32,7 +72,7 @@ namespace BiancasBikeShop.Repositories
         public int GetBikesInShopCount()
         {
             int count = 0;
-            // implement code here... 
+            // implement code here...
             return count;
         }
     }
