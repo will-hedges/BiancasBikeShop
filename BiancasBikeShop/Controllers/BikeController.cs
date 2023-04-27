@@ -36,12 +36,10 @@ namespace BiancasBikeShop.Controllers
             return Ok(bike);
         }
 
-        //
-        // public IActionResult GetBikesInShopCount()
-        // {
-        //     //add implementation here...
-
-        //     return Ok();
-        // }
+        [HttpGet("inShop")]
+        public IActionResult GetBikesInShopCount()
+        {
+            return Ok(_bikeRepo.GetBikesInShopCount());
+        }
     }
 }

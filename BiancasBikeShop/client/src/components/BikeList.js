@@ -16,7 +16,11 @@ export default function BikeList({ setDetailsBikeId }) {
     <>
       <h2>Bikes</h2>
       {bikes.map((bike) => (
-        <BikeCard bike={bike} setDetailsBikeId={setDetailsBikeId} />
+        <BikeCard
+          key={bike.id}
+          bike={bike}
+          setDetailsBikeId={setDetailsBikeId}
+        />
       ))}
     </>
   );

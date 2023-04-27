@@ -23,5 +23,13 @@ export const getBikeById = (id) => {
 };
 
 export const getBikesInShopCount = () => {
-  //add implementation here...
+  return fetch(`${apiUrl}/inshop`, { method: "GET" }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    } else {
+      throw new Error(
+        "An unknown error occurred while trying to count bikes in the shop."
+      );
+    }
+  });
 };

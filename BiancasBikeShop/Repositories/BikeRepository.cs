@@ -111,17 +111,21 @@ namespace BiancasBikeShop.Repositories
                             }
                             if (DbUtils.IsNotDbNull(reader, "WorkOrderId"))
                             {
-                                WorkOrder workOrder = new WorkOrder()
-                                {
-                                    Id = DbUtils.GetInt(reader, "WorkOrderId"),
-                                    DateInitiated = DbUtils.GetDateTime(reader, "DateInitiated"),
-                                    Description = DbUtils.GetString(reader, "Description"),
-                                    DateCompleted = DbUtils.GetNullableDateTime(
-                                        reader,
-                                        "DateCompleted"
-                                    )
-                                };
-                                bike.WorkOrders.Add(workOrder);
+                                bike.WorkOrders.Add(
+                                    new WorkOrder()
+                                    {
+                                        Id = DbUtils.GetInt(reader, "WorkOrderId"),
+                                        DateInitiated = DbUtils.GetDateTime(
+                                            reader,
+                                            "DateInitiated"
+                                        ),
+                                        Description = DbUtils.GetString(reader, "Description"),
+                                        DateCompleted = DbUtils.GetNullableDateTime(
+                                            reader,
+                                            "DateCompleted"
+                                        )
+                                    }
+                                );
                             }
                         }
                         return bike;
@@ -133,7 +137,28 @@ namespace BiancasBikeShop.Repositories
         public int GetBikesInShopCount()
         {
             int count = 0;
-            // implement code here...
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText =
+                        @"
+                        SELECT COUNT(DISTINCT Bike.Id) AS NumBikes
+                            FROM Bike
+                                INNER JOIN WorkOrder ON Bike.Id = WorkOrder.BikeId
+                        WHERE WorkOrder.DateCompleted IS NULL;
+                        ";
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            count = DbUtils.GetInt(reader, "NumBikes");
+                        }
+                    }
+                }
+            }
             return count;
         }
     }
